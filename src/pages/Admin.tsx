@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { db, doc, setDoc, deleteDoc, collection, onSnapshot, query, orderBy } from '../lib/firebase';
-import { Loader2, Plus, Users, Copy, Check, Trash2, Upload, FileJson, ChevronDown, ChevronUp, History, Clock } from 'lucide-react';
+import { Loader2, Plus, Users, Copy, Check, Trash2, Upload, FileJson, ChevronDown, ChevronUp, History, Clock, Bot } from 'lucide-react';
+import SecretChatDrawer from '../components/SecretChatDrawer';
 
 export default function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
+  
+  const [isChatOpen, setIsChatOpen] = useState(false);
   
   const [creationMode, setCreationMode] = useState<'ai' | 'manual'>('ai');
   const [topic, setTopic] = useState('');
@@ -201,6 +204,12 @@ export default function Admin() {
             <h1 className="text-2xl font-bold text-neutral-800">Bảng điều khiển Giáo viên</h1>
             <p className="text-neutral-500 text-sm mt-1">Dữ liệu sẽ tự động được xóa sau 24 giờ để tối ưu chi phí.</p>
           </div>
+          <button 
+            onClick={() => setIsChatOpen(true)}
+            className="mt-4 md:mt-0 flex items-center gap-2 bg-indigo-50 text-indigo-600 px-4 py-2 rounded-xl font-medium hover:bg-indigo-100 transition"
+          >
+            <Bot className="w-5 h-5" /> Trợ lý AI
+          </button>
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -438,6 +447,7 @@ export default function Admin() {
 
         </div>
       </div>
+      <SecretChatDrawer isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
     </div>
   );
 }
