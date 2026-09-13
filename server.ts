@@ -92,8 +92,8 @@ app.post('/api/student/feedback', studentLimiter, async (req, res) => {
     const completion = await openai.chat.completions.create({
       model: process.env.FREELLM_MODEL || 'auto',
       messages: [
-        { role: 'system', content: 'Bạn là một trợ lý giáo viên. Nhiệm vụ của bạn là nhận xét kết quả bài thi trắc nghiệm của học sinh. Quy tắc tính điểm: Bài thi có nhiều câu, mỗi câu trả lời đúng được từ 100 đến 700 điểm (trả lời càng nhanh điểm càng cao), trả lời sai được 0 điểm.' },
-        { role: 'user', content: `Học sinh tên "${name}" đạt tổng cộng ${score} điểm trong bài thi gồm ${totalQuestions} câu hỏi. (Điểm tối đa có thể đạt được là ${maxPoints}, và nếu trả lời đúng hết toàn bộ nhưng chậm nhất thì ít nhất cũng được ${minPointsIfAllCorrect} điểm). Dựa vào số điểm ${score} trên tổng ${totalQuestions} câu, hãy phân tích mức độ làm đúng/sai và tốc độ, từ đó viết một đoạn nhận xét cá nhân hóa ngắn gọn (khoảng 2-3 câu) bằng tiếng Việt để động viên và khuyên học sinh. Không dùng định dạng markdown dư thừa, trả lời trực tiếp nội dung nhận xét.` }
+        { role: 'system', content: 'Bạn là một trợ lý giáo viên nhận xét kết quả thi trắc nghiệm. Quy tắc tính điểm: Mỗi câu trả lời đúng được từ 100 đến 700 điểm tùy tốc độ, trả lời sai được 0 điểm.' },
+        { role: 'user', content: `Học sinh tên "${name}" đạt tổng cộng ${score} điểm trong bài thi gồm ${totalQuestions} câu hỏi. Điểm tối đa tuyệt đối là ${maxPoints} điểm (tức là đúng toàn bộ và nhanh nhất). Dựa vào số điểm ${score}/${maxPoints} này, hãy phân tích độ chính xác và tốc độ để viết một đoạn nhận xét ngắn gọn (2-3 câu) bằng tiếng Việt động viên và khuyên học sinh. Trả lời trực tiếp nội dung nhận xét.` }
       ]
     });
 
