@@ -1,0 +1,37 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    function isValidString(val) {
+      return val is string && val.size() > 0 && val.size() <= 1000;
+    }
+
+    function isValidNumber(val) {
+      return val is number;
+    }
+    
+    function incoming() {
+      return request.resource.data;
+    }
+    
+    match /quizzes/{inviteCode} {
+      // Anyone can read a quiz if they have the invite code (which is the document ID)
+      allow read: if true;
+      // Anyone can create a quiz (done via server usually, but client works too)
+      allow create: if true;
+      allow update, delete: if false; // Immutable after creation
+
+      match /scores/{studentId} {
+        // Anyone can read scores for a leaderboard
+        allow read: if true;
+        // Anyone can create a score
+        allow create: if true;
+        allow update, delete: if false; // Immutable after creation
+      }
+    }
+    
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

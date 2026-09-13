@@ -1,0 +1,6 @@
+{
+  "name": "AI Quiz Web App",
+  "description": "A real-time AI-powered quiz application.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

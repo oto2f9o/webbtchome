@@ -1,0 +1,56 @@
+{
+  "entities": {
+    "Quiz": {
+      "title": "Quiz",
+      "description": "A generated quiz session",
+      "type": "object",
+      "properties": {
+        "inviteCode": { "type": "string" },
+        "topic": { "type": "string" },
+        "questions": {
+          "type": "array",
+          "items": { "$ref": "#/entities/Question" }
+        },
+        "createdAt": { "type": "number", "description": "Timestamp (milliseconds)" }
+      },
+      "required": ["inviteCode", "topic", "questions", "createdAt"]
+    },
+    "Question": {
+      "title": "Question",
+      "type": "object",
+      "properties": {
+        "question": { "type": "string" },
+        "options": {
+          "type": "array",
+          "items": { "type": "string" },
+          "maxLength": 4,
+          "minLength": 4
+        },
+        "correctAnswer": { "type": "integer" }
+      },
+      "required": ["question", "options", "correctAnswer"]
+    },
+    "StudentScore": {
+      "title": "Student Score",
+      "description": "Score of a student for a specific quiz",
+      "type": "object",
+      "properties": {
+        "inviteCode": { "type": "string" },
+        "name": { "type": "string" },
+        "score": { "type": "number" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["inviteCode", "name", "score", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/quizzes/{inviteCode}": {
+      "schema": "#/entities/Quiz",
+      "description": "Stores the quiz data by invite code"
+    },
+    "/quizzes/{inviteCode}/scores/{studentId}": {
+      "schema": "#/entities/StudentScore",
+      "description": "Stores the score of students for the quiz"
+    }
+  }
+}
