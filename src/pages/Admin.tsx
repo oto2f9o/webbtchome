@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db, doc, setDoc, deleteDoc, collection, onSnapshot, query, orderBy } from '../lib/firebase';
-import { Loader2, Plus, Users, Copy, Check, Trash2, Upload, FileJson, ChevronDown, ChevronUp } from 'lucide-react';
+import { Loader2, Plus, Users, Copy, Check, Trash2, Upload, FileJson, ChevronDown, ChevronUp, History, Clock } from 'lucide-react';
 
 export default function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -16,6 +16,7 @@ export default function Admin() {
   
   const [activeQuiz, setActiveQuiz] = useState<any>(null);
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
+  const [quizHistory, setQuizHistory] = useState<any[]>([]);
   const [copied, setCopied] = useState(false);
   const [expandedStudentId, setExpandedStudentId] = useState<string | null>(null);
 
@@ -120,6 +121,25 @@ export default function Admin() {
       alert('Không thể xóa bài thi: ' + err);
     }
   };
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    
+    const q = query(collection(db, 'quizzes'), orderBy('createdAt', 'desc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const history = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setQuizHistory(history);
+      
+      setActiveQuiz(current => {
+        if (!current && history.length > 0) {
+          return history[0];
+        }
+        return current;
+      });
+    });
+    
+    return () => unsubscribe();
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (!activeQuiz) return;
@@ -278,6 +298,41 @@ export default function Admin() {
                     <FileJson className="w-5 h-5" /> Lưu bài thi
                   </button>
                 </form>
+              )}
+            </div>
+            
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-neutral-100">
+              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <History className="w-5 h-5 text-neutral-500" /> Lịch sử đề thi
+              </h2>
+              
+              {quizHistory.length === 0 ? (
+                <p className="text-sm text-neutral-500 text-center py-4">Chưa có đề thi nào.</p>
+              ) : (
+                <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                  {quizHistory.map(quiz => (
+                    <div 
+                      key={quiz.id}
+                      onClick={() => setActiveQuiz(quiz)}
+                      className={`p-3 rounded-xl border cursor-pointer transition ${
+                        activeQuiz?.inviteCode === quiz.inviteCode 
+                          ? 'bg-blue-50 border-blue-200 ring-1 ring-blue-500' 
+                          : 'bg-neutral-50 border-transparent hover:bg-neutral-100 hover:border-neutral-200'
+                      }`}
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <h4 className="font-medium text-sm text-neutral-800 line-clamp-2">{quiz.topic}</h4>
+                      </div>
+                      <div className="flex justify-between items-center text-xs text-neutral-500">
+                        <span className="font-mono bg-white px-2 py-1 rounded border border-neutral-200 text-blue-600 font-semibold">{quiz.inviteCode}</span>
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          {new Date(quiz.createdAt).toLocaleDateString('vi-VN')} {new Date(quiz.createdAt).toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'})}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           </div>
