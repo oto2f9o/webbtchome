@@ -119,6 +119,28 @@ app.post('/api/student/feedback', studentLimiter, async (req, res) => {
   }
 });
 
+app.post('/api/secret-chat', async (req, res) => {
+  try {
+    const { prompt, history } = req.body;
+
+    const messages = [
+      { role: 'system', content: 'Bạn là trợ lý bí mật của Andz. Trả lời ngắn gọn, thông minh.' },
+      ...(history || []),
+      { role: 'user', content: prompt }
+    ];
+
+    const completion = await openai.chat.completions.create({
+      model: process.env.FREELLM_MODEL || 'auto',
+      messages,
+    });
+
+    res.json({ reply: completion.choices[0].message?.content || "" });
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: err.message || 'Lỗi server' });
+  }
+});
+
 async function startServer() {
   if (!isProduction) {
     const vite = await createViteServer({

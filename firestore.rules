@@ -19,15 +19,19 @@ service cloud.firestore {
       allow read: if true;
       // Anyone can create a quiz (done via server usually, but client works too)
       allow create: if true;
-      allow update, delete: if false; // Immutable after creation
+      allow update, delete: if true; // Teacher deletes quizzes, update needed for aiFeedback
 
       match /scores/{studentId} {
         // Anyone can read scores for a leaderboard
         allow read: if true;
         // Anyone can create a score
         allow create: if true;
-        allow update, delete: if false; // Immutable after creation
+        allow update, delete: if true; // Update needed for aiFeedback
       }
+    }
+
+    match /secret_chats/{chatId} {
+      allow read, write: if true;
     }
     
     match /{document=**} {
